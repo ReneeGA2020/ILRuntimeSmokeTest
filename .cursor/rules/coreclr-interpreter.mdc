@@ -1,0 +1,44 @@
+---
+description: CoreCLR interpreter hot-update project conventions — hosting, interop, IL scanning
+alwaysApply: true
+---
+
+# CoreCLR Interpreter Hot-Update Conventions
+
+## Project Layout
+
+| Directory | Role |
+|-----------|------|
+| `CoreClrInterpTest/` | Standalone interpreter benchmark app |
+| `BenchLib/` | R2R-compiled benchmark library for Mode 1 native comparison |
+| `NativeHost/` | C++ host embedding CoreCLR via hostfxr |
+| `NativeHost/managed/` | C# plugin loaded by the C++ host |
+| `LuaHost/` | C++ Lua 5.4 host for performance comparison |
+| `IlScanner/` | Mono.Cecil-based IL security scanner |
+| `TestPluginSafe/`, `TestPluginDangerous/` | Scanner test fixtures |
+| `ILRuntimeSmokeTest/` | Legacy ILRuntime third-party interpreter tests |
+| `Wasi/` | WASI-WASM interpreter baseline |
+
+## Key Conventions
+
+- Target framework is `net11.0` for all CoreCLR interpreter projects.
+- C++ projects use CMake with `/MT` static CRT to match `libnethost.lib`.
+- C# exports to C++ use `[UnmanagedCallersOnly]` — no COM, no P/Invoke wrappers.
+- C# → C++ callbacks use `delegate* unmanaged[Stdcall]<...>` function pointers received from native `Init`.
+- `runtimeconfig.json` is maintained manually alongside plugin csproj (required by hostfxr).
+
+## Interpreter Testing
+
+- Custom CoreCLR with interpreter enabled built from `F:\runtime` (modified `clrfeatures.cmake` and `clr.featuredefines.props`).
+- Use `corerun.exe` with `DOTNET_InterpMode=1` and `CORE_LIBRARIES` pointing to installed shared framework for quick testing.
+- For hostfxr-based testing, use `dotnet_interp/` custom runtime root with matching `coreclr.dll`, `clrinterpreter.dll`, `clrjit.dll`, `System.Private.CoreLib.dll`.
+
+## IL Scanning Rules
+
+- Scanner blocklist defined in `IlScanner/ScanPolicy.cs` — extend `GameEditorDefault` for new dangerous APIs.
+- Scanner checks: namespace/type/method blocklist, P/Invoke, `calli`, unsafe pointers, explicit layout.
+- Test both safe and dangerous plugins after policy changes.
+
+## String Formatting in ILRuntime
+
+ILRuntime does not support `ref struct` (`DefaultInterpolatedStringHandler`) or `InlineArray` (used by `string.Format` args). In code that may run under ILRuntime, use manual `.ToString()` + string concatenation instead.

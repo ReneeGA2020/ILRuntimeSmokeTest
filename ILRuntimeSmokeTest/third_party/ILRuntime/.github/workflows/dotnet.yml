@@ -1,0 +1,50 @@
+name: Build Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: |
+          10.0.x
+    - name: Build Hotfix Project
+      run: dotnet build -c Release HotfixAOT/
+    - name: Build Hotfix Project(Patched)
+      run: dotnet build -c Release_Patched HotfixAOT/
+    - name: Inject hotfix library
+      run: dotnet run -c Release --project PatchTool/PatchTool.csproj -- -i -h HotfixAOT/Patched/HotfixAOT.hash -o HotfixAOT/Patched/HotfixAOT.dll HotfixAOT/bin/Release/net10.0/HotfixAOT.dll
+    - name: Generate hotfix Patch
+      run: dotnet run -c Release --project PatchTool/PatchTool.csproj -- -p -o HotfixAOT/Patched/HotfixAOT.patch HotfixAOT/Patched/HotfixAOT.hash HotfixAOT/bin/Release_Patched/net10.0/HotfixAOT.dll
+    - name: Build Test Cases
+      run: dotnet build TestCases/
+    - name: Build Test Cases(Release)
+      run: dotnet build -c Release TestCases/
+    - name: Test (I:Debug T:Debug R:false)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
+    - name: Test (I:Debug T:Debug R:true)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true
+    - name: Test (I:Debug T:Release R:false)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
+    - name: Test (I:Debug T:Release R:true)
+      run: dotnet run --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true
+    - name: Test (I:Release T:Debug R:false)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
+    - name: Test (I:Release T:Debug R:true)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Debug/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true
+    - name: Test (I:Release T:Release R:false)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch false
+    - name: Test (I:Release T:Release R:true)
+      run: dotnet run -c Release --verbosity normal --project ILRuntimeTestCLI/ILRuntimeTestCLI.csproj TestCases/bin/Release/net10.0/TestCases.dll HotfixAOT/Patched/HotfixAOT.patch true    

@@ -1,0 +1,22 @@
+# Build outputs
+bin/
+obj/
+build/
+AppBundle/
+*.user
+*.suo
+
+# Custom runtime (desktop interpreter testing only, see deployment.md)
+NativeHost/dotnet_interp/
+
+# ILRuntime NuGet packages (restore with dotnet restore)
+ILRuntimeSmokeTest/third_party/ILRuntime/packages/
+
+# IDE
+.vs/
+*.sln.docstats
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

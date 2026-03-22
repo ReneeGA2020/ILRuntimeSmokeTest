@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>IlrtHost</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\third_party\ILRuntime\ILRuntime\ILRuntime.csproj" />
+    <ProjectReference Include="..\IlrtShared\IlrtShared.csproj" />
+    <ProjectReference Include="..\IlrtHotDll\IlrtHotDll.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Target Name="CopyHotDll" AfterTargets="Build">
+    <PropertyGroup>
+      <_HotOut>$(MSBuildThisFileDirectory)..\IlrtHotDll\bin\$(Configuration)\net10.0\</_HotOut>
+    </PropertyGroup>
+    <MakeDir Directories="$(OutputPath)hot\" />
+    <ItemGroup>
+      <_HotFiles Include="$(_HotOut)IlrtHotDll.dll" />
+      <_HotFiles Include="$(_HotOut)IlrtHotDll.pdb" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_HotFiles)" DestinationFolder="$(OutputPath)hot\" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

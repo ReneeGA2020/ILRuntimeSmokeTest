@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="IlrtHost/IlrtHost.csproj" />
+  <Project Path="IlrtHotDll/IlrtHotDll.csproj" />
+</Solution>

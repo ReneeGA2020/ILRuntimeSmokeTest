@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ILRuntimeTestCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../../TestCases/bin/Release/net10.0/TestCases.dll ../../../../HotfixAOT/Patched/HotfixAOT.patch false"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+*.suo
+bin/
+obj/
+*.user
+.vs
+docs/source/package-lock.json
+Debugging/VSCode/VSCodeExtension/yarn.lock
