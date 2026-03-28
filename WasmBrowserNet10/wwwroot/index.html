@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Browser WASM: AOT + Plugin Dynamic Loading Test</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preload" id="webassembly" />
+  <script type="importmap"></script>
+  <style>
+    body { font-family: monospace; background: #1e1e1e; color: #d4d4d4; padding: 20px; max-width: 900px; }
+    h3 { color: #569cd6; margin-bottom: 5px; }
+    #output { white-space: pre; font-size: 13px; line-height: 1.5; }
+    .info { color: #888; font-size: 12px; margin-bottom: 15px; }
+  </style>
+  <script type='module' src="main#[.{fingerprint}].js"></script>
+</head>
+<body>
+  <h3>Browser WASM: AOT Host + Interpreted Plugin</h3>
+  <div class="info">Host benchmarks are AOT compiled to WASM. Plugin is loaded dynamically via HTTP and interpreted.</div>
+  <pre id="output">Initializing runtime...</pre>
+</body>
+</html>
